@@ -1,7 +1,7 @@
 <template>
   <v-app class="app">
     <v-main>
-      <v-container>
+      <v-container :fluid="true">
         <v-row class="justify-space-around">
           <v-col cols="4" md="3">
             <Fabrics />
