@@ -1235,8 +1235,10 @@ export const Potrace = (function () {
             return p;
         }
 
-        var width = bm.w * size, height = bm.h * size,
-            len = pathlist.length, c, i, strokec, fillc, fillrule;
+        const width = bm.w * size;
+        const height = bm.h * size;
+        const len = pathlist.length;
+        let c, i, strokec, fillc, fillrule;
 
         ///var svg = `<svg id="svg" version="2" width="${w}" height="${h}" viewbox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">`;
         let svgPath = '<path d="';

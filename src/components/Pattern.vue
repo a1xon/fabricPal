@@ -1,7 +1,11 @@
 <template>
     <div class="my-5"></div>
     <v-row>
-        <v-col cols="12" class="dynamicsegment d-flex justify-center align-center pattern">
+        <v-col
+            cols="12"
+            id="pattern"
+            class="dynamicsegment d-flex justify-center align-center pattern"
+        >
             <div class="dropbox" v-if="processingStatus === 'userinput'">
                 <input
                     class="input-file px-2 py-1 text-sm font-semibold rounded hover:(text-white bg-sky-100 border-transparent) focus:(outline-none ring-2 ring-sky-200)"
@@ -14,12 +18,13 @@
                     <br />or click to browse
                 </p>
             </div>
-            <h2 v-if="!['userinput', ''].includes(processingStatus)">{{ processingStatus }}</h2>
+            <h2 v-if="!['userinput', 'ready', ''].includes(processingStatus)">{{ processingStatus }}</h2>
             <svg
-                id="svg"
-                version="2"
                 :width="svg.width"
                 :height="svg.height"
+                preserveAspectRatio="xMinYMin slice"
+                id="svg"
+                version="2"
                 :viewbox="`0 0 ${svg.width} ${svg.height}`"
                 xmlns="http://www.w3.org/2000/svg"
                 @click="handleSVGclick"
@@ -47,30 +52,16 @@
     </v-row>
 </template>
 
-<style>
+<style scoped>
 .pattern {
     height: 90vh;
-}
-.pattern > svg {
-    max-width: 100%;
-    max-height: 100%;
 }
 </style>
 
 <script>
-import { ref, reactive, computed, inject } from 'vue';
+import { ref, reactive, inject } from 'vue';
 import { Potrace } from '../plugins/potrace'
 import { SVGPathElementExtender } from '../plugins/path-data-polyfill'
-
-class Pattern {
-    constructor(image) {
-        this.id = Math.random().toString(16).slice(2)
-        this.image = image;
-        this.selected = false;
-    }
-}
-
-const randomColor = () => '#' + ('00000' + (Math.random() * (1 << 24) | 0).toString(16)).slice(-6)
 
 export default {
     setup() {
@@ -105,7 +96,18 @@ export default {
         const breakUpFile = () => {
             processingStatus.value = "breaking up";
             const svgElement = document.getElementById('svg');
-            const { svgPath, width, height } = Potrace.getSVG(1);
+            const patternContainer = document.getElementById('pattern');
+            let { svgPath, width, height } = Potrace.getSVG(1);
+
+            /// redo with propper factor
+            /// this is somewhat hacky
+            
+            console.log({ svgPath, width, height });
+            const factor = Math.min(patternContainer.clientWidth / width, patternContainer.clientHeight / height);
+            console.log(factor);
+            ({ svgPath, width, height } = Potrace.getSVG(factor))
+            console.log({ svgPath, width, height });
+
             svg.width = width;
             svg.height = height;
 
@@ -123,9 +125,9 @@ export default {
                 return acc
             }, []);
 
-            processingStatus.value = "";
+            processingStatus.value = "ready";
             pathsData.sort((a, b) => b.length - a.length);
-            
+
             for (const [index, d] of pathsData.entries()) {
                 const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
                 path.setPathData(d);
@@ -140,7 +142,6 @@ export default {
 
                 svg.paths.push(path);
                 svgElement.appendChild(path);
-                //console.log(path);
             }
         }
         return { svg, patternFileInput, processingStatus, fabrics, handleSVGclick }
