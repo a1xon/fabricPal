@@ -84,13 +84,14 @@
 
 .mainlogo {
     max-width: 300px;
-    min-width: 100px;
+    min-width: 200px;
     width: 20vw;
 }
 </style>
 
 <script>
-import { ref, reactive, computed, inject, provide } from 'vue';
+import { ref, computed, inject } from 'vue';
+import blank from "../assets/img/fabrics/blank.png"
 import fabric0 from "../assets/img/fabrics/fabric0.jpg"
 import fabric1 from "../assets/img/fabrics/fabric1.jpg"
 import fabric2 from "../assets/img/fabrics/fabric2.jpg"
@@ -117,6 +118,7 @@ export default {
         const {getFabrics, pushFabrics, selectFabric, selectedFabric} = store();
 
         pushFabrics([
+            new Fabric({ src: blank, width: 200, height: 200 }),
             new Fabric({ src: fabric0, width: 800, height: 600 }),
             new Fabric({ src: fabric1, width: 600, height: 800 }),
             new Fabric({ src: fabric2, width: 605, height: 605 }),
